@@ -1,12 +1,14 @@
 import { generateId } from 'ontime-utils';
 import {
   Alias,
+  EndAction,
   EventData,
   OntimeRundown,
   OSCSettings,
   OscSubscription,
   Settings,
   TimerLifeCycle,
+  TimerType,
   UserFields,
   ViewSettings,
 } from 'ontime-types';
@@ -39,6 +41,18 @@ export const parseRundown = (data): OntimeRundown => {
         if (ids.indexOf(e?.id) !== -1) {
           console.log('ERROR: ID collision on import, skipping');
           continue;
+        }
+
+        // validate the right endAction is used
+        if (e.endAction && !Object.values(EndAction).includes(e.endAction)) {
+          e.endAction = EndAction.None;
+          console.log('WARNING: invalid End Action provided, using default');
+        }
+
+        // validate the right timerType is used
+        if (e.timerType && !Object.values(TimerType).includes(e.timerType)) {
+          e.timerType = TimerType.CountDown;
+          console.log('WARNING: invalid Timer Type provided, using default');
         }
 
         if (e.type === 'event') {
